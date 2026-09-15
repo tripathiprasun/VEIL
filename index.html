@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VEIL — Local Steganography Workstation</title>
+<meta name="description" content="A browser-only, local-first workstation for hiding and extracting data in images." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to workspace</a>
+
+<div class="app" id="app">
+
+  <!-- ===== Top bar ===== -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M12 3 3 7.5v6c0 4.5 3.6 7.6 9 10.5 5.4-2.9 9-6 9-10.5v-6L12 3Z" stroke-linejoin="round"/>
+          <path d="M8.5 12.2 11 14.7l4.7-5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="brand-word">VEIL</span>
+      <span class="brand-sub">LOCAL STEGANOGRAPHY WORKSTATION</span>
+    </div>
+    <div class="topbar-right">
+      <button class="cmdk-trigger" id="cmdkTrigger" type="button" aria-haspopup="dialog" aria-controls="cmdk">
+        <span>Commands</span>
+        <kbd>⌘K</kbd>
+      </button>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle theme">
+        <svg id="themeIconMoon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z" stroke-linejoin="round"/></svg>
+        <svg id="themeIconSun" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.6" hidden><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7" stroke-linecap="round"/></svg>
+      </button>
+      <div class="status-pill" id="statusPill">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">LOCAL / READY</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="shell">
+    <!-- ===== Sidebar ===== -->
+    <nav class="sidebar" id="sidebar" aria-label="Workspace modes">
+      <button class="nav-item" data-mode="encode" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 19V5M6 11l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Encode</span>
+      </button>
+      <button class="nav-item" data-mode="decode" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M6 13l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Decode</span>
+      </button>
+      <button class="nav-item" data-mode="inspect" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.5-4.5" stroke-linecap="round"/></svg>
+        <span>Inspect</span>
+      </button>
+      <div class="nav-spacer"></div>
+      <button class="nav-item" data-mode="settings" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.9 2.9l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V20a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.9-2.9l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.9-2.9l.1.1a1.7 1.7 0 0 0 1.9.3H10a1.7 1.7 0 0 0 1-1.6V4a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.9 2.9l-.1.1a1.7 1.7 0 0 0-.3 1.9V10a1.7 1.7 0 0 0 1.6 1H20a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" stroke-linejoin="round"/></svg>
+        <span>Settings</span>
+      </button>
+      <button class="nav-item" data-mode="about" type="button">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 8v.01" stroke-linecap="round"/></svg>
+        <span>About</span>
+      </button>
+    </nav>
+
+    <!-- ===== Main workspace ===== -->
+    <main class="workspace" id="main">
+
+      <!-- ---------- ENCODE ---------- -->
+      <section class="view" id="view-encode" data-view="encode">
+        <div class="workspace-grid">
+          <div class="panel carrier-panel">
+            <div class="panel-head">
+              <h2>Carrier image</h2>
+              <button class="ghost-btn" id="encodeSampleBtn" type="button">Use sample</button>
+            </div>
+            <div class="dropzone" id="encodeDropzone" tabindex="0" role="button" aria-label="Select or drop a carrier image">
+              <div class="dropzone-empty" id="encodeDropEmpty">
+                <span class="dropzone-eyebrow">Image source</span>
+                <p class="dropzone-title">No carrier loaded</p>
+                <p class="dropzone-hint">Drop a PNG into the workspace, or choose a file manually.</p>
+                <button class="primary-btn" id="encodeChooseBtn" type="button">Choose file</button>
+              </div>
+              <div class="dropzone-preview" id="encodeDropPreview" hidden>
+                <img id="encodePreviewImg" alt="" />
+              </div>
+              <input type="file" id="encodeFileInput" accept="image/png,image/webp,image/jpeg" hidden />
+            </div>
+            <dl class="meta-strip" id="encodeCarrierMeta" hidden>
+              <div><dt>File</dt><dd id="encMetaFile">—</dd></div>
+              <div><dt>Format</dt><dd id="encMetaFormat">—</dd></div>
+              <div><dt>Dimensions</dt><dd id="encMetaDims">—</dd></div>
+              <div><dt>Size</dt><dd id="encMetaSize">—</dd></div>
+            </dl>
+            <p class="inline-warning" id="encodeJpegWarning" hidden>
+              JPEG input is not suitable for preserving hidden data — recompression destroys LSB bits. The output will always be exported as PNG regardless of the source format.
+            </p>
+          </div>
+
+          <div class="panel payload-panel">
+            <div class="panel-head">
+              <h2>Payload</h2>
+              <div class="segmented" role="tablist" aria-label="Payload type">
+                <button class="segmented-btn is-active" id="encodePayloadText" role="tab" aria-selected="true" type="button">Text</button>
+                <button class="segmented-btn" id="encodePayloadFile" role="tab" aria-selected="false" type="button">File</button>
+              </div>
+            </div>
+
+            <div class="payload-body" id="encodeTextBody">
+              <label class="field-label" for="encodeTextArea">Secret message</label>
+              <textarea id="encodeTextArea" rows="7" placeholder="Type the message to conceal…"></textarea>
+            </div>
+            <div class="payload-body" id="encodeFileBody" hidden>
+              <label class="field-label" for="encodeFileInputPayload">File to conceal</label>
+              <div class="file-chooser" id="encodeFileChooser">
+                <button class="ghost-btn" id="encodeChooseFileBtn" type="button">Choose file</button>
+                <span id="encodeFileChosenName">No file selected</span>
+              </div>
+              <input type="file" id="encodeFileInputPayload" hidden />
+            </div>
+
+            <div class="divider" role="presentation"></div>
+
+            <div class="crypto-row">
+              <label class="switch">
+                <input type="checkbox" id="encodeEncryptToggle" />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="switch-label">Encrypt payload</span>
+              </label>
+              <p class="micro-note">Steganography hides that data exists. Encryption protects what it says. Use both for anything sensitive.</p>
+              <div class="password-field" id="encodePasswordField" hidden>
+                <label class="field-label" for="encodePassword">Password</label>
+                <input type="password" id="encodePassword" autocomplete="new-password" placeholder="Used to derive an AES-256 key (PBKDF2)" />
+              </div>
+            </div>
+
+            <div class="divider" role="presentation"></div>
+
+            <div class="capacity-block">
+              <div class="capacity-head">
+                <span>Capacity</span>
+                <span class="capacity-figures" id="capacityFigures">— / —</span>
+              </div>
+              <div class="signal-meter" id="capacityMeter" aria-hidden="true"></div>
+              <div class="capacity-foot">
+                <span id="capacityPercent">0%</span>
+                <span id="capacityRemaining">—</span>
+              </div>
+            </div>
+
+            <button class="primary-btn full-width" id="encodeSubmitBtn" type="button" disabled>Embed payload</button>
+            <p class="error-line" id="encodeError" hidden></p>
+          </div>
+        </div>
+
+        <div class="panel result-panel" id="encodeResultPanel" hidden>
+          <div class="panel-head">
+            <h2>Output</h2>
+            <span class="verify-badge" id="encodeVerifyBadge">Verifying…</span>
+          </div>
+          <div class="result-body">
+            <div class="result-preview">
+              <img id="encodeResultImg" alt="Encoded output preview" />
+            </div>
+            <div class="result-info">
+              <dl class="meta-strip vertical">
+                <div><dt>Output file</dt><dd id="encResultName">—</dd></div>
+                <div><dt>Payload size</dt><dd id="encResultPayloadSize">—</dd></div>
+                <div><dt>Used capacity</dt><dd id="encResultCapacityUsed">—</dd></div>
+                <div><dt>SHA-256</dt><dd class="mono truncate" id="encResultHash">—</dd></div>
+              </dl>
+              <div class="result-actions">
+                <button class="primary-btn" id="encodeDownloadBtn" type="button">Download PNG</button>
+                <button class="ghost-btn" id="encodeCompareBtn" type="button">Compare in Inspect</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- DECODE ---------- -->
+      <section class="view" id="view-decode" data-view="decode" hidden>
+        <div class="workspace-grid">
+          <div class="panel carrier-panel">
+            <div class="panel-head">
+              <h2>Stego image</h2>
+            </div>
+            <div class="dropzone" id="decodeDropzone" tabindex="0" role="button" aria-label="Select or drop a stego image">
+              <div class="dropzone-empty" id="decodeDropEmpty">
+                <span class="dropzone-eyebrow">Image source</span>
+                <p class="dropzone-title">No image loaded</p>
+                <p class="dropzone-hint">Drop a VEIL-encoded PNG, or choose a file manually.</p>
+                <button class="primary-btn" id="decodeChooseBtn" type="button">Choose file</button>
+              </div>
+              <div class="dropzone-preview" id="decodeDropPreview" hidden>
+                <img id="decodePreviewImg" alt="" />
+              </div>
+              <input type="file" id="decodeFileInput" accept="image/png,image/webp,image/jpeg" hidden />
+            </div>
+            <dl class="meta-strip" id="decodeCarrierMeta" hidden>
+              <div><dt>File</dt><dd id="decMetaFile">—</dd></div>
+              <div><dt>Format</dt><dd id="decMetaFormat">—</dd></div>
+              <div><dt>Dimensions</dt><dd id="decMetaDims">—</dd></div>
+              <div><dt>Size</dt><dd id="decMetaSize">—</dd></div>
+            </dl>
+          </div>
+
+          <div class="panel payload-panel">
+            <div class="panel-head">
+              <h2>Detection</h2>
+            </div>
+            <div class="detect-status" id="decodeDetectStatus">
+              <span class="status-chip" id="decodeStatusChip">Awaiting image</span>
+              <p id="decodeStatusMessage" class="micro-note">Load an image to check for a VEIL payload.</p>
+            </div>
+
+            <div class="password-field" id="decodePasswordField" hidden>
+              <label class="field-label" for="decodePassword">Password</label>
+              <input type="password" id="decodePassword" autocomplete="current-password" placeholder="This payload is encrypted" />
+              <p class="error-line" id="decodePasswordError" hidden></p>
+            </div>
+
+            <button class="primary-btn full-width" id="decodeSubmitBtn" type="button" disabled>Extract payload</button>
+            <p class="error-line" id="decodeError" hidden></p>
+
+            <div class="decode-result" id="decodeResult" hidden>
+              <div class="divider" role="presentation"></div>
+              <dl class="meta-strip vertical">
+                <div><dt>Payload type</dt><dd id="decResultType">—</dd></div>
+                <div><dt>Original size</dt><dd id="decResultSize">—</dd></div>
+                <div><dt>Encryption</dt><dd id="decResultEncryption">—</dd></div>
+              </dl>
+              <div class="decode-text-output" id="decodeTextOutput" hidden>
+                <label class="field-label" for="decodeTextArea">Recovered message</label>
+                <textarea id="decodeTextArea" rows="6" readonly></textarea>
+                <button class="ghost-btn" id="decodeCopyBtn" type="button">Copy text</button>
+              </div>
+              <div class="decode-file-output" id="decodeFileOutput" hidden>
+                <p class="mono" id="decodeFileMeta">—</p>
+                <button class="primary-btn" id="decodeDownloadBtn" type="button">Download file</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- INSPECT ---------- -->
+      <section class="view" id="view-inspect" data-view="inspect" hidden>
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Image inspector</h2>
+            <button class="ghost-btn" id="inspectChooseBtn" type="button">Load image</button>
+            <input type="file" id="inspectFileInput" accept="image/png,image/webp,image/jpeg" hidden />
+          </div>
+
+          <div class="inspector-empty" id="inspectorEmpty">
+            <span class="dropzone-eyebrow">Forensic view</span>
+            <p class="dropzone-title">Nothing loaded</p>
+            <p class="dropzone-hint">Load any image, or encode one first — it will appear here automatically.</p>
+          </div>
+
+          <div class="inspector-body" id="inspectorBody" hidden>
+            <div class="inspector-preview">
+              <img id="inspectImg" alt="" />
+            </div>
+            <div class="inspector-columns">
+              <section class="inspector-section">
+                <h3>File</h3>
+                <dl class="kv-list">
+                  <div><dt>Name</dt><dd id="insFileName">—</dd></div>
+                  <div><dt>Size</dt><dd id="insFileSize">—</dd></div>
+                  <div><dt>Format</dt><dd id="insFileFormat">—</dd></div>
+                </dl>
+              </section>
+              <section class="inspector-section">
+                <h3>Image</h3>
+                <dl class="kv-list">
+                  <div><dt>Width</dt><dd id="insWidth">—</dd></div>
+                  <div><dt>Height</dt><dd id="insHeight">—</dd></div>
+                  <div><dt>Aspect ratio</dt><dd id="insAspect">—</dd></div>
+                </dl>
+              </section>
+              <section class="inspector-section">
+                <h3>Data</h3>
+                <dl class="kv-list">
+                  <div><dt>Pixel count</dt><dd id="insPixels">—</dd></div>
+                  <div><dt>Est. capacity</dt><dd id="insCapacity">—</dd></div>
+                  <div><dt>Payload size</dt><dd id="insPayloadSize">—</dd></div>
+                  <div><dt>Payload type</dt><dd id="insPayloadType">—</dd></div>
+                </dl>
+              </section>
+              <section class="inspector-section">
+                <h3>VEIL</h3>
+                <dl class="kv-list">
+                  <div><dt>Payload detected</dt><dd id="insDetected">—</dd></div>
+                  <div><dt>Version</dt><dd id="insVersion">—</dd></div>
+                  <div><dt>Integrity</dt><dd id="insIntegrity">—</dd></div>
+                </dl>
+              </section>
+            </div>
+
+            <details class="hash-panel">
+              <summary>Technical hash</summary>
+              <p class="mono break" id="insHash">Calculating…</p>
+            </details>
+
+            <details class="diff-panel" id="diffPanel">
+              <summary>Compare against original (visual diff)</summary>
+              <div class="diff-body">
+                <p class="micro-note" id="diffHint">Encode an image in this session to unlock a pixel-level comparison against its original carrier.</p>
+                <div class="diff-canvases" id="diffCanvases" hidden>
+                  <canvas id="diffCanvas"></canvas>
+                </div>
+                <dl class="kv-list" id="diffMetrics" hidden>
+                  <div><dt>Changed pixels</dt><dd id="diffChanged">—</dd></div>
+                  <div><dt>Percent changed</dt><dd id="diffPercent">—</dd></div>
+                  <div><dt>Avg. channel Δ</dt><dd id="diffAvg">—</dd></div>
+                  <div><dt>Max channel Δ</dt><dd id="diffMax">—</dd></div>
+                </dl>
+              </div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- SETTINGS ---------- -->
+      <section class="view" id="view-settings" data-view="settings" hidden>
+        <div class="panel settings-panel">
+          <div class="panel-head"><h2>Settings</h2></div>
+
+          <div class="setting-row">
+            <div>
+              <p class="setting-title">Theme</p>
+              <p class="micro-note">Dark suits low-light work; light reads like a printed technical document.</p>
+            </div>
+            <div class="segmented" role="radiogroup" aria-label="Theme">
+              <button class="segmented-btn" data-theme-choice="dark" type="button">Dark</button>
+              <button class="segmented-btn" data-theme-choice="light" type="button">Light</button>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <p class="setting-title">Reduce motion</p>
+              <p class="micro-note">Disables non-essential transitions and animation.</p>
+            </div>
+            <label class="switch"><input type="checkbox" id="settingReduceMotion" /><span class="switch-track" aria-hidden="true"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <p class="setting-title">Confirm before clearing</p>
+              <p class="micro-note">Ask before discarding a loaded carrier or extracted payload.</p>
+            </div>
+            <label class="switch"><input type="checkbox" id="settingConfirmClear" /><span class="switch-track" aria-hidden="true"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <p class="setting-title">Show technical metadata</p>
+              <p class="micro-note">Display hashes, byte counts, and format internals throughout the app.</p>
+            </div>
+            <label class="switch"><input type="checkbox" id="settingShowMeta" /><span class="switch-track" aria-hidden="true"></span></label>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <p class="setting-title">Clear workspace</p>
+              <p class="micro-note">Releases loaded images, object URLs, and any in-memory payload data.</p>
+            </div>
+            <button class="ghost-btn danger" id="clearWorkspaceBtn" type="button">Clear now</button>
+          </div>
+
+          <div class="setting-row">
+            <div>
+              <p class="setting-title">Internal test suite</p>
+              <p class="micro-note">Round-trips the encoder/decoder against known cases directly in this browser.</p>
+            </div>
+            <button class="ghost-btn" id="runTestsBtn" type="button">Run tests</button>
+          </div>
+
+          <div class="test-output" id="testOutput" hidden>
+            <pre id="testOutputPre"></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------- ABOUT ---------- -->
+      <section class="view" id="view-about" data-view="about" hidden>
+        <div class="panel about-panel">
+          <div class="panel-head"><h2>About VEIL</h2></div>
+
+          <article class="prose">
+            <p>VEIL is a browser-only steganography workstation. Everything — image decoding, encryption, embedding, extraction, hashing — runs inside this page. Nothing is uploaded anywhere.</p>
+
+            <h3>Architecture</h3>
+            <p>Vanilla HTML, CSS, and JavaScript, loaded as plain scripts rather than ES modules so the app also runs correctly when <code>index.html</code> is opened directly as a <code>file://</code> URL. Heavy work (pixel embedding, extraction, hashing) prefers a Web Worker; most browsers block worker construction from <code>file://</code> origins, so VEIL falls back to running the identical algorithm on the main thread in that case. Serve the folder over any static HTTP server to get the worker path.</p>
+
+            <h3>Binary payload format</h3>
+            <p>A small versioned container — magic bytes, version, flags, payload type, filename/MIME lengths, original size, a 16-byte salt and 12-byte IV region, filename, MIME, payload bytes, and a trailing CRC-32 — is embedded ahead of the raw pixel bits. A 32-bit length prefix on the image tells the decoder exactly how many bits to read. The decoder validates magic, version, and CRC before trusting any other field, so a corrupted or truncated image fails with a specific message instead of producing garbage output.</p>
+
+            <h3>Cryptography</h3>
+            <p>Encryption is optional and separate from hiding: steganography conceals that data exists, encryption protects what it says. When enabled, a password is stretched with PBKDF2-SHA256 (310,000 iterations) using a fresh random 16-byte salt, producing an AES-256-GCM key with a fresh random 12-byte nonce. GCM is authenticated: a wrong password and a tampered ciphertext both fail verification rather than decrypting into silent garbage. Salts, IVs, and randomness all come from <code>crypto.getRandomValues</code> / Web Crypto — never <code>Math.random()</code>, and no encryption primitive is implemented by hand.</p>
+
+            <h3>Steganography</h3>
+            <p>Mode <strong>LSB_RGB</strong>: one bit hidden in the least-significant bit of each of the red, green, and blue channels of every pixel, in row-major, R→G→B order. Alpha is left untouched. Capacity is therefore <code>floor(width × height × 3 / 8)</code> bytes, minus a small fixed header. PNG (and WebP) preserve these bits exactly; JPEG's lossy compression does not, so VEIL always exports PNG regardless of the input format, and warns before encoding a JPEG carrier. After every encode, VEIL immediately decodes its own output and verifies the payload round-trips correctly before reporting success.</p>
+
+            <h3>Security model</h3>
+            <ul>
+              <li><strong>Encrypted, when enabled:</strong> the payload bytes and filename/MIME metadata inside the container.</li>
+              <li><strong>Hidden, always:</strong> the presence of a payload, from casual visual inspection of the image.</li>
+              <li><strong>Not protected:</strong> resistance to statistical steganalysis, or protection if the image is recompressed, resized, or re-encoded after embedding — any of those will corrupt or destroy the payload.</li>
+              <li><strong>Not provided:</strong> anonymity. Steganography hides content, not the fact that you sent someone a file.</li>
+              <li>Passwords are never stored or transmitted; they exist only in memory for the duration of a single encrypt/decrypt operation.</li>
+            </ul>
+
+            <h3>Supported formats</h3>
+            <p>Input: PNG, WebP, JPEG (JPEG is decoded for inspection only — re-export is always PNG). Output: PNG.</p>
+          </article>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== Footer status bar ===== -->
+  <footer class="statusbar" id="statusbar">
+    <span id="statusbarLeft">Local processing — all data stays on this device.</span>
+    <span id="statusbarRight"></span>
+  </footer>
+</div>
+
+<!-- ===== Command palette ===== -->
+<div class="cmdk-overlay" id="cmdkOverlay" hidden>
+  <div class="cmdk" id="cmdk" role="dialog" aria-modal="true" aria-label="Command palette">
+    <input type="text" id="cmdkInput" placeholder="Type a command…" autocomplete="off" />
+    <ul id="cmdkList"></ul>
+  </div>
+</div>
+
+<!-- ===== Toast region ===== -->
+<div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+<script src="js/utils.js"></script>
+<script src="js/crc32.js"></script>
+<script src="js/crypto.js"></script>
+<script src="js/payload.js"></script>
+<script src="js/stego.js"></script>
+<script src="js/processing.js"></script>
+<script src="js/image.js"></script>
+<script src="js/state.js"></script>
+<script src="js/tests.js"></script>
+<script src="js/commands.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
